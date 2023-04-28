@@ -4,7 +4,7 @@ import { CategoryService } from '../../shared/services/category.service';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ProductService } from '../../shared/services/product.service';
 
-export interface Category{
+export interface Category {
   description: string;
   id: number;
   name: string;
@@ -13,65 +13,81 @@ export interface Category{
 @Component({
   selector: 'app-new-product',
   templateUrl: './new-product.component.html',
-  styleUrls: ['./new-product.component.css']
+  styleUrls: ['./new-product.component.css'],
 })
-export class NewProductComponent implements OnInit{
-
+export class NewProductComponent implements OnInit {
   public productForm: FormGroup;
-  estadoFormulario: string = "";
+  estadoFormulario: string = '';
   categories: Category[] = [];
   selectedFile: any;
-  nameImg: string ="";
+  nameImg: string = '';
 
-  constructor( private fb: FormBuilder,
+  constructor(
+    private fb: FormBuilder,
     private categoryService: CategoryService,
     private productService: ProductService,
     private dialogRef: MatDialogRef<NewProductComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any) {
+    @Inject(MAT_DIALOG_DATA) public data: any
+  ) {
+    this.estadoFormulario = 'Agregar';
+    this.productForm = this.fb.group({
+      name: ['', Validators.required],
+      price: ['', Validators.required],
+      account: ['', Validators.required],
+      category: ['', Validators.required],
+      picture: [''],
+    });
 
-      this.estadoFormulario = "Agregar"
-      this.productForm = this.fb.group({
-        name: ['', Validators.required],
-        price: ['', Validators.required],
-        account: ['', Validators.required],
-        category: ['', Validators.required],
-        picture: ['', Validators.required],
-      });
+    if (data != null) {
+      this.updateForm(data);
+      this.estadoFormulario = 'Actualizar';
+    }
   }
 
   ngOnInit(): void {
     this.getCategories();
   }
 
-  onSave(){
-    let data ={
+  onSave() {
+    let data = {
       name: this.productForm.get('name')?.value,
       price: this.productForm.get('price')?.value,
       account: this.productForm.get('account')?.value,
       category: this.productForm.get('category')?.value,
-      picture: this.selectedFile
-
-    }
+      picture: this.selectedFile,
+    };
 
     const uploadImageData = new FormData();
-    uploadImageData.append('picture', data.picture, data.picture.name)
-    uploadImageData.append('name', data.name)
-    uploadImageData.append('price', data.price)
-    uploadImageData.append('account', data.account)
-    uploadImageData.append('categoryId', data.category)
+    uploadImageData.append('picture', data.picture, data.picture.name);
+    uploadImageData.append('name', data.name);
+    uploadImageData.append('price', data.price);
+    uploadImageData.append('account', data.account);
+    uploadImageData.append('categoryId', data.category);
 
-    //call the service to save a product
-    this.productService.saveProduct(uploadImageData).subscribe({
-      next: (data: any) => {
-        this.dialogRef.close(1);
-      },
-      error: (error: any) => {
-        this.dialogRef.close(2);
-      }
-    })
+    if ((this.data != null)) {
+      //update the product
+      this.productService.updateProduct(uploadImageData, this.data.id).subscribe({
+        next: (data: any) => {
+          this.dialogRef.close(1);
+        },
+        error: (error: any) => {
+          this.dialogRef.close(2);
+        },
+      });
+    } else {
+      //call the service to save a product
+      this.productService.saveProduct(uploadImageData).subscribe({
+        next: (data: any) => {
+          this.dialogRef.close(1);
+        },
+        error: (error: any) => {
+          this.dialogRef.close(2);
+        },
+      });
+    }
   }
 
-  onCancel(){
+  onCancel() {
     this.dialogRef.close(3);
   }
 
@@ -82,14 +98,23 @@ export class NewProductComponent implements OnInit{
       },
 
       error: (error: any) => {
-        console.log("error al consultar cagegorias");
-      }
-    })
+        console.log('error al consultar cagegorias');
+      },
+    });
   }
 
-  onFileChange(event:any){
+  onFileChange(event: any) {
     this.selectedFile = event.target.files[0];
     this.nameImg = event.target.files[0].name;
   }
 
+  updateForm(data: any) {
+    this.productForm = this.fb.group({
+      name: [data.name, Validators.required],
+      price: [data.price, Validators.required],
+      account: [data.account, Validators.required],
+      category: [data.category.id, Validators.required],
+      picture: [''],
+    });
+  }
 }

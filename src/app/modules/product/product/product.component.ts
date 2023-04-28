@@ -113,6 +113,18 @@ export class ProductComponent implements OnInit {
     });
   }
 
+  buscar(nombre: any){
+    if(nombre.length === 0){
+      return this.getProducts();
+    }
+
+    this.productService.getProductByName(nombre).subscribe({
+      next: (resp: any) => {
+        this.processProductResponse(resp);
+      }
+    })
+  }
+
   openSnackBar(
     mesagge: string,
     action: string

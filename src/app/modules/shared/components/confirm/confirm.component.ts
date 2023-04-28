@@ -2,35 +2,49 @@ import { Component, Inject, OnInit } from '@angular/core';
 
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { CategoryService } from '../../services/category.service';
+import { ProductService } from '../../services/product.service';
 
 @Component({
   selector: 'app-confirm',
   templateUrl: './confirm.component.html',
-  styleUrls: ['./confirm.component.css']
+  styleUrls: ['./confirm.component.css'],
 })
-export class ConfirmComponent implements OnInit{
+export class ConfirmComponent implements OnInit {
+  constructor(
+    public dialogRef: MatDialogRef<ConfirmComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: any,
+    private categoryService: CategoryService,
+    private productService: ProductService
+  ) {}
 
-  constructor(public dialogRef: MatDialogRef<ConfirmComponent>, @Inject (MAT_DIALOG_DATA) public data: any, private categoryService: CategoryService){
-
-  }
-
-  ngOnInit(): void {
-      
-  }
-  onNoclick(){
+  ngOnInit(): void {}
+  onNoclick() {
     this.dialogRef.close(3);
   }
 
-  deleteCategorie() {
-    if(this.data != null){
-      this.categoryService.deleteCategorie(this.data.id).subscribe((data:any) =>{
-        this.dialogRef.close(1);
-      },(error: any) =>{
+  delete() {
+    if (this.data != null) {
+      if (this.data.module == 'category') {
+        this.categoryService.deleteCategorie(this.data.id).subscribe(
+          (data: any) => {
+            this.dialogRef.close(1);
+          },
+          (error: any) => {
+            this.dialogRef.close(2);
+          }
+        );
+      } else if (this.data.module == 'product') {
+        this.productService.deleteProduct(this.data.id).subscribe(
+          (data: any) => {
+            this.dialogRef.close(1);
+          },
+          (error: any) => {
+            this.dialogRef.close(2);
+          }
+        );
+      } else {
         this.dialogRef.close(2);
-      })
-    } else {
-      this.dialogRef.close(2);
+      }
     }
   }
-
 }

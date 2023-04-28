@@ -5,6 +5,7 @@ import { ProductService } from '../../shared/services/product.service';
 import { MatSnackBar, MatSnackBarRef, SimpleSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { NewProductComponent } from '../new-product/new-product.component';
+import { ConfirmComponent } from '../../shared/components/confirm/confirm.component';
 
 @Component({
   selector: 'app-product',
@@ -54,7 +55,7 @@ export class ProductComponent implements OnInit {
 
       listCProduct.forEach((element: ProductElement) => {
         //element.category =  element.category.name;
-        
+
         element.picture = "data:image/jpeg;base64," + element.picture;
         dateProduct.push(element);
       });
@@ -92,6 +93,22 @@ export class ProductComponent implements OnInit {
         this.getProducts();
       } else if (result == 2) {
         this.openSnackBar("Se produjo un error al editar producto","Error");
+      }
+    });
+  }
+
+  delete(id:any){
+    const dialogRef = this.dialog.open(ConfirmComponent, {
+      width: '450px',
+      data: {id: id, module: "product"}
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result == 1) {
+        this.openSnackBar("Producto eliminado","Exitoso");
+        this.getProducts();
+      } else if (result == 2) {
+        this.openSnackBar("Se produjo un error al eliminar el producto","Error");
       }
     });
   }

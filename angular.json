@@ -33,6 +33,10 @@
           },
           "configurations": {
             "production": {
+              "allowedCommonJsDependencies": [
+                "base64-js",
+                "js-sha256"
+              ],
               "budgets": [
                 {
                   "type": "initial",

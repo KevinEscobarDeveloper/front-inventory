@@ -10,6 +10,7 @@ import { CategoryService } from 'src/app/modules/shared/services/category.servic
 import { NewCategoryComponent } from '../new-category/new-category.component';
 import { ConfirmComponent } from 'src/app/modules/shared/components/confirm/confirm.component';
 import { MatPaginator } from '@angular/material/paginator';
+import { UtilService } from 'src/app/modules/shared/services/util.service';
 
 @Component({
   selector: 'app-category',
@@ -17,14 +18,18 @@ import { MatPaginator } from '@angular/material/paginator';
   styleUrls: ['./category.component.css'],
 })
 export class CategoryComponent implements OnInit {
+
+  isAdmin: any;
   constructor(
     private categoryService: CategoryService,
     public dialog: MatDialog,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private util: UtilService,
   ) {}
 
   ngOnInit(): void {
     this.getCategories();
+    this.isAdmin = this.util.isAdmin();
   }
 
   displayedColumns: string[] = ['id', 'name', 'description', 'actions'];

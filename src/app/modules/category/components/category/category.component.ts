@@ -117,7 +117,6 @@ export class CategoryComponent implements OnInit {
 
     this.categoryService.getCategoryById(termino).subscribe((resp:any) => {
       this.processCategoriesResponse(resp);
-      console.log(resp);
     })
   }
 
@@ -128,6 +127,23 @@ export class CategoryComponent implements OnInit {
     return this.snackBar.open(mesagge, action, {
       duration: 2000,
     });
+  }
+
+  exportExcel(){
+    this.categoryService.exportCategories().subscribe({
+      next: (data: any) => {
+        let file = new Blob([data], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+        let fileUrl = URL.createObjectURL(file);
+        var anchor = document.createElement("a");
+        anchor.download = "categories.xlsx";
+        anchor.href = fileUrl;
+        anchor.click();
+        this.openSnackBar("Archivo exportado correctamente","Exitoso");
+      },
+      error: (error:any) => {
+        this.openSnackBar("No se pudo exportar el archivo","Error");
+      }
+    })
   }
 }
 
